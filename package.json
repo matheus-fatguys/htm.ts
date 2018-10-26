@@ -1,0 +1,36 @@
+{
+  "name":"HTM-typescript",
+  "description":"HTM Framework simple typscript implementation",
+  "version":"0.0.1",
+  "homepage":"https://github.com/matheus-fatguys/htm-typescript",
+  "bugs":"https://github.com/matheus-fatguys/htm-typescript/issues",
+  "repository" :{"type" : "git", "url" : "https://github.com/matheus-fatguys/htm-typescript.git"},
+  "license":"ISC",
+  "scripts": {
+    "test": "gulp testar",
+    "empacotar": "gulp empacotar",
+    "debug": "gulp debug"
+  },
+  "devDependencies": {
+    "@types/selenium-webdriver": "^3.0.7",
+    "alsatian": "^1.2.1",
+    "browser-sync": "^2.18.13",
+    "browserify": "^14.4.0",
+    "del": "^3.0.0",
+    "gulp": "^3.9.1",
+    "gulp-sourcemaps": "^2.6.1",
+    "gulp-tslint": "^8.1.2",
+    "gulp-typescript": "^3.2.2",
+    "gulp-uglify": "^3.0.0",
+    "gulp-util": "^3.0.8",
+    "selenium-webdriver": "^3.6.0",
+    "tsify": "^3.0.3",
+    "tslint": "^5.7.0",
+    "tslint-consistent-codestyle": "^1.8.0",
+    "tslint-eslint-rules": "^4.1.1",
+    "typescript": "^2.5.2",
+    "vinyl-buffer": "^1.0.0",
+    "vinyl-source-stream": "^1.1.0",
+    "watchify": "^3.9.0"
+  }
+}

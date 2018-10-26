@@ -1,0 +1,49 @@
+{
+    "extends":"tslint:recommended",
+    "rules": {
+        "no-duplicate-variable": true,
+        "no-unused-variable": [
+        true
+        ],
+        "no-console":false,
+        "early-exit":true,
+        "no-constant-condition": true,
+        "const-parameters": true,
+        "ext-curly":false,
+        "naming-convention":true,
+        "no-as-type-assertion":false,
+        "no-collapsible-if":true,
+        "no-else-after-return":true,
+        "no-return-undefined":true,
+        "no-static-this":true,
+        "no-unnecessary-else":true,
+        "no-unused":true,
+        "no-var-before-return":true,
+        "object-shorthand-properties-first":true,
+        "parameter-properties":true,
+        "prefer-const-enum":true,
+        "prefer-while":true,
+        "no-control-regex":true,
+        "no-duplicate-case":true,
+        "no-ex-assign":true,
+        "no-extra-boolean-cast":true,
+        "no-extra-semi":true,
+        "no-inner-declarations":true,
+        "no-invalid-regexp":true,
+        "ter-no-irregular-whitespace":true,
+        "no-regex-spaces":true,
+        "ter-no-sparse-arrays":true,
+        "no-unexpected-multiline":true,
+        "no-unsafe-finally":true,
+        "valid-jsdoc":true,
+        "valid-typeof":true,
+        "cyclomatic-complexity":true,
+        "handle-callback-err": [true, "error"],
+        "ter-func-call-spacing": [true],
+        "sort-imports": true
+    },
+    "rulesDirectory": [
+        "node_modules/tslint-eslint-rules/dist/rules",
+        "tslint-consistent-codestyle"
+    ]
+}
