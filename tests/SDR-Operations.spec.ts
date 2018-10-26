@@ -118,11 +118,11 @@ export class SDROperationsTestFixture {
         let activeBits1=[0,1,2];
 
         let w2=4
-        let n2=10
+        let n2=20
         let activeBits2=[3, 4, 5, 6];
 
         let sdr1 = SDRBuilder.build(w1, n1, activeBits1);
-        let sdr2 = SDRBuilder.build(w1, n1, activeBits1);
+        let sdr2 = SDRBuilder.build(w2, n2, activeBits2);
 
         let concatenation = sdr1.concatenate(sdr2);
 
