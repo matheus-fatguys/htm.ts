@@ -6,10 +6,10 @@ import { SDR, SDRBuilder } from './../sdr/SDR';
 @TestFixture("SDR creation integrity")
 export class SDROperationsTestFixture {
 
-    @Test("Overlaping 2 SDRs with no overlapping bits must empty")
-    public test_no_overlaping_score_must_be_empty() {
+    @Test("Overlaping 2 non overlapping SDRs overlapping bits must have overlapScore =0")
+    public test_no_overlaping_score() {
         //1110000000
-        //and
+        //overlap
         //0001110000
         //=
         //0000000000
@@ -31,10 +31,10 @@ export class SDROperationsTestFixture {
         Expect(overlapScore).toBe(0);
     }
 
-    @Test("Overlaping 2 SDRs with no overlapping bits must have an overlapping score of 0")
+    @Test("Overlaping 2 non overlapping SDRs must have an overlapping score of 0")
     public test_no_overlaping_score_must_be_0() {
         //1110000000
-        //and
+        //overlap
         //0001110000
         //=
         //0000000000
@@ -48,7 +48,8 @@ export class SDROperationsTestFixture {
 
         let sdr1 = SDRBuilder.build(w1, n1, activeBits1);
         let sdr2 = SDRBuilder.build(w1, n1, activeBits1);
-
+        
+        Expect(sdr2.overlap(sdr1)).toBe(0);
         Expect(sdr1.overlapScore(sdr2)).toBe(0);
         Expect(sdr2.overlapScore(sdr1)).toBe(0);
     }
@@ -56,7 +57,7 @@ export class SDROperationsTestFixture {
     @Test("Overlaping 2 indentical SDRs must be equal to both of them")
     public test_overlaping_2_identical_SDRs() {
         //1110000000
-        //and
+        //overlap
         //1110000000
         //=
         //1110000000
@@ -83,7 +84,7 @@ export class SDROperationsTestFixture {
     @Test("Overlaping 2 indentical SDRs must have overlap score equal to w")
     public test_overlaping_2_identical_SDRs_must_have_overlap_score_equal_to_w() {
         //1110000000
-        //and
+        //overlap
         //1110000000
         //=
         //1110000000
@@ -101,7 +102,7 @@ export class SDROperationsTestFixture {
     @Test("Overlaping 2 SDRs with just the second bit overlapping must result in active bits equal to [1]")
     public test_overlaping_2_SDRs_with_just_the_second_bit_overlapping() {
         //1110000000
-        //and
+        //overlap
         //0011100000
         //=
         //0010000000
@@ -123,7 +124,7 @@ export class SDROperationsTestFixture {
     @Test("Overlaping 2 SDRs with just one overlapping bit must have ovelrap score equal to 1")
     public test_overlaping_2_SDRs_with_just_1_overlapping_bit_must_have_overlap_score_equal_to_1() {
         //1110000000
-        //and
+        //overlap
         //0011100000
         //=
         //0010000000
@@ -173,6 +174,53 @@ export class SDROperationsTestFixture {
         .toBe(0);
     }
 
+    @Test("Uniting 2 SDRs with no overlapping bits must have n=n, w=2*w, 2*n active bits and overlaping score with both SDRs = n")
+    public test_union_no_overlaping_SDRs_must_have() {
+        //1110000000
+        //union
+        //0001110000
+        //=
+        //1111110000
+        let w=3
+        let n=10
+        let activeBits1=[0, 1, 2];
+
+        let activeBits2=[3, 4, 5];
+
+        let sdr1 = SDRBuilder.build(w, n, activeBits1);
+        let sdr2 = SDRBuilder.build(w, n, activeBits1);
+
+        let union = sdr1.union(sdr2);
+
+        Expect(union.n).toBe(n);
+        Expect(union.w).toBe(w);
+        Expect(union.activeBits.length).toBe(2*w);
+        Expect(union.overlapScore(sdr1)).toBe(w);
+        Expect(union.overlapScore(sdr2)).toBe(w);
+    }
+
+    @Test("Uniting 2 identical SDRs must have n=n, w=w, n active bits and overlaping score = w")
+    public test_union_identical_SDRs_must_have() {
+        //1110000000
+        //union
+        //1110000000
+        //=
+        //1110000000
+        let w=3
+        let n=10
+        let activeBits=[0, 1, 2];
+
+        let sdr1 = SDRBuilder.build(w, n, activeBits);
+        let sdr2 = SDRBuilder.build(w, n, activeBits);
+
+        let union = sdr1.union(sdr2);
+
+        Expect(union.n).toBe(n);
+        Expect(union.w).toBe(w);
+        Expect(union.activeBits.length).toBe(w);
+        Expect(union.overlapScore(sdr1)).toBe(w);
+        Expect(union.overlapScore(sdr2)).toBe(w);
+    }
     
 
 }

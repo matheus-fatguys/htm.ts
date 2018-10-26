@@ -2,7 +2,8 @@ export interface  SDR{
     n:number,
     w:number,
     activeBits: number[],
-    union(otherSDR:SDR):SDR
+    getSparsity():number,
+    union(otherSDR:SDR):SDR,
     overlap(otherSDR:SDR):SDR,
     overlapScore(otherSDR:SDR):number,
     concatenate(otherSDR:SDR):SDR
@@ -19,6 +20,10 @@ export class SDRImpl implements SDR{
         this.w=w
         this.activeBits=activeBits.sort()
 
+    }
+    
+    public getSparsity(): number {
+        return this.w/this.n;
     }
 
     private verify(n:number, w:number, activeBits:number[]):void{
@@ -38,6 +43,7 @@ export class SDRImpl implements SDR{
     public union(otherSDR: SDR): SDR {
         throw new Error("Method not implemented.");
     }
+
     public overlap(otherSDR: SDR): SDR {
         let bits= this.activeBits
         .map((bit:number) => {
@@ -49,9 +55,11 @@ export class SDRImpl implements SDR{
         return SDRBuilder.build(n, w, bits);
 
     }
+
     public overlapScore(otherSDR: SDR): number{
         return this.overlap(otherSDR).activeBits.length;
     }
+
     public concatenate(otherSDR: SDR): SDR {
         let n = this.n+otherSDR.n
         let w = this.w+otherSDR.w
