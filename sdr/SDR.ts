@@ -53,7 +53,10 @@ export class SDRImpl implements SDR{
         return this.overlap(otherSDR).activeBits.length;
     }
     public concatenate(otherSDR: SDR): SDR {
-        throw new Error("Method not implemented.");
+        let n = this.n+otherSDR.n
+        let w = this.w+otherSDR.w
+        let concatenation = this.activeBits.concat(otherSDR.activeBits.map(bit=>bit+this.n));
+        return SDRBuilder.build(n, w, concatenation);
     }
 
 }
