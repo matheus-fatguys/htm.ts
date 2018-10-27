@@ -2,8 +2,8 @@ var gulp = require("gulp");
 
 var ts = require("gulp-typescript");
 var tsProject = ts.createProject("tsconfig.json");
-var tsProjectTestesUnitarios = ts.createProject("testes/tsconfig.json");
-var tsProjectTestesPontaAPonta = ts.createProject("testes-ponta-a-ponta/tsconfig.json");
+var tsProjectUnitTests = ts.createProject("tests/tsconfig.json");
+var tsProjectEndToEndTests = ts.createProject("end-to-end-tests/tsconfig.json");
 var alsatian=  require("alsatian");
 var TestSet = alsatian.TestSet;
 var  TestRunner = alsatian.TestRunner;
@@ -24,21 +24,27 @@ var gulpTslint = require("gulp-tslint");
 var tslint = require("tslint");
 
 var paths = {
-    pages: ['src/*.html'],
-    styles: ['src/*.css'],
-    testesUnitarios: ['./saida/**/*.spec.js'],
-    testesPontaAPonta: ['./saida/testes-ponta-a-ponta/**/*.spec.js'],
+    pages: ['src/**/*.html'],
+    styles: ['src/**/*.css'],
+    unitTests: ['./out/**/*.spec.js'],
+    endToEndTests: ['./out/end-to-end-tests/**/*.spec.js'],
     tsFiles: ['./src/**/*.ts'],
-    saidaTestes:"./saida",
-    saida:"./saida",
+    outTests:"./out",
+    out:"./out",
     dist:"./dist",
 };
 
 
-function compilar(){
+function compile(){
     return tsProject.src()
         .pipe(tsProject());        
 }
+
+gulp.task("compile", () =>{    
+    return tsProject.src()
+    .pipe(tsProject())
+    .js.pipe(gulp.dest(paths.outTests+"/src/"));
+});
 
 gulp.task("tslint", () =>{
     var program = tslint.Linter.createProgram("./tsconfig.json");
@@ -47,28 +53,28 @@ gulp.task("tslint", () =>{
     .pipe(gulpTslint.report())
 });
 
-gulp.task("compilar-testes-unitarios", ["clean-saida"], function () {
-    return compilar()
-        .js.pipe(gulp.dest(paths.saidaTestes+"/src/"))
-        .pipe(tsProjectTestesUnitarios.src())
-        .pipe(tsProjectTestesUnitarios())
-        .js.pipe(gulp.dest(paths.saidaTestes));
+gulp.task("compile-unit-tests", ["clean-out"], function () {
+    return compile()
+        .js.pipe(gulp.dest(paths.outTests+"/src/"))
+        .pipe(tsProjectUnitTests.src())
+        .pipe(tsProjectUnitTests())
+        .js.pipe(gulp.dest(paths.outTests));
 });
 
-gulp.task("compilar-testes-ponta-a-ponta", ["clean-saida"], function () {
-    return tsProjectTestesPontaAPonta.src()
-        .pipe(tsProjectTestesPontaAPonta())
-        .js.pipe(gulp.dest(paths.saidaTestes));
+gulp.task("compile-end-to-end-tests", ["clean-out"], function () {
+    return tsProjectEndToEndTests.src()
+        .pipe(tsProjectEndToEndTests())
+        .js.pipe(gulp.dest(paths.outTests));
 });
 
 
-gulp.task("testar-unitarios", ["compilar-testes-unitarios", "tslint"], (done) => {
+gulp.task("unit-tests", ["compile-unit-tests", "tslint"], (done) => {
 
     // create test set
     const testSet = TestSet.create();
 
     // add your tests
-    testSet.addTestsFromFiles(paths.testesUnitarios);
+    testSet.addTestsFromFiles(paths.unitTests);
 
     // create a test runner
     const testRunner = new TestRunner();
@@ -87,13 +93,13 @@ gulp.task("testar-unitarios", ["compilar-testes-unitarios", "tslint"], (done) =>
               .then(() => done());
 });
 
-gulp.task("testar-ponta-a-ponta", ["compilar-testes-ponta-a-ponta", "debug", "tslint"], (done) => {
+gulp.task("test-end-to-end", ["compile-end-to-end-tests", "debug", "tslint"], (done) => {
 
     // create test set
     const testSet = TestSet.create();
 
     // add your tests
-    testSet.addTestsFromFiles(paths.testesPontaAPonta);
+    testSet.addTestsFromFiles(paths.endToEndTests);
 
     // create a test runner
     const testRunner = new TestRunner();
@@ -112,21 +118,21 @@ gulp.task("testar-ponta-a-ponta", ["compilar-testes-ponta-a-ponta", "debug", "ts
               .then(() => done());
 });
 
-gulp.task("testar", ["testar-unitarios", "testar-ponta-a-ponta"]);
+gulp.task("test", ["unit-tests", "test-end-to-end"]);
 
 
 
-gulp.task("construir", ['clean-saida'], function(){
-    return compilar()
-    .js.pipe(gulp.dest(paths.saida));
+gulp.task("build", ['clean-out'], function(){
+    return compile()
+    .js.pipe(gulp.dest(paths.out));
 });
 
 
 
 
-gulp.task('clean-saida', function () {
+gulp.task('clean-out', function () {
   return del([
-    paths.saida+'/**/*'
+    paths.out+'/**/*'
   ]);
 });
 
@@ -141,14 +147,14 @@ gulp.task('copy-polyfill', function () {
         .pipe(gulp.dest(paths.dist));
 });
 
-gulp.task('copy-polyfill-saida', function () {
+gulp.task('copy-polyfill-out', function () {
   return gulp.src("./node_modules/babel-polyfill/dist/polyfill.min.js")
-        .pipe(gulp.dest(paths.saida));
+        .pipe(gulp.dest(paths.out));
 });
 
-gulp.task("copy-html-saida", function () {
+gulp.task("copy-html-out", function () {
     return gulp.src(paths.pages)
-        .pipe(gulp.dest(paths.saida));
+        .pipe(gulp.dest(paths.out));
 });
 
 gulp.task("copy-html", function () {
@@ -156,9 +162,9 @@ gulp.task("copy-html", function () {
         .pipe(gulp.dest(paths.dist));
 });
 
-gulp.task("copy-css-saida", function () {
+gulp.task("copy-css-out", function () {
     return gulp.src(paths.styles)
-        .pipe(gulp.dest(paths.saida));
+        .pipe(gulp.dest(paths.out));
 });
 
 gulp.task("copy-css", function () {
@@ -193,11 +199,11 @@ function bundle() {
         .pipe(sourcemaps.init({loadMaps: true}))
         .pipe(uglify())        
         .pipe(sourcemaps.write('./'))
-        .pipe(gulp.dest(paths.saida))
+        .pipe(gulp.dest(paths.out))
         .pipe(browserSync.stream({once: true}));
 }
 
-gulp.task("empacotar", ["copy-html", "copy-css", 'copy-polyfill', "clean-dist"], function(){
+gulp.task("pack", ["copy-html", "copy-css", 'copy-polyfill', "clean-dist"], function(){
     return browserify({
                 basedir: '.',
                 debug: false,
@@ -219,17 +225,17 @@ gulp.task("empacotar", ["copy-html", "copy-css", 'copy-polyfill', "clean-dist"],
             .pipe(gulp.dest(paths.dist));    
 });
 
-gulp.task('empacotar-debug', ["copy-html-saida", "copy-css-saida", 'copy-polyfill-saida', "clean-saida"], function () {
+gulp.task('pack-debug', ["copy-html-out", "copy-css-out", 'copy-polyfill-out', "clean-out"], function () {
     return bundle();
 });
 
-gulp.task("debug", ["empacotar-debug"], function () {    
+gulp.task("debug", ["pack-debug"], function () {    
     browserSync.init({
-        server: paths.saida
+        server: paths.out
     });
 });
 
 watchedBrowserify.on("update", bundle);
 watchedBrowserify.on("log", gutil.log);
 
-gulp.task("default", ["empacotar"]);
+gulp.task("default", ["pack"]);

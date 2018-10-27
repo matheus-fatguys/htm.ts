@@ -18,7 +18,8 @@ npm-debug.log*
 .versions/
 coverage/
 dist/
-saida/
+out/
+out-end-to-end/
 node_modules/
 tmp/
 temp/
