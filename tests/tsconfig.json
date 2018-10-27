@@ -3,8 +3,8 @@
         "module": "commonjs",
         "target": "es6",
         "experimentalDecorators": true,
-        "outDir":"./out/",
-        "rootDir": "./"
+        "outDir":"./out",
+        "rootDir": "../"
     },
     "include": [
       "./**/*spec.ts"

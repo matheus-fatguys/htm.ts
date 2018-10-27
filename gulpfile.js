@@ -68,7 +68,8 @@ gulp.task("compile-end-to-end-tests", ["clean-out"], function () {
 });
 
 
-gulp.task("unit-tests", ["compile-unit-tests", "tslint"], (done) => {
+// gulp.task("unit-tests", ["compile-unit-tests", "tslint"], (done) => {
+gulp.task("unit-tests", (done) => {
 
     // create test set
     const testSet = TestSet.create();

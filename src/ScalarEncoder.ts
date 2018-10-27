@@ -7,6 +7,8 @@ export class  ScalarEncoder extends EncoderBase {
     public max: number;
     public min: number;
     public buckets: number[];
+    public bucketIndexes: number[];
+    public bucketSize: number;
 
     public constructor(n: number, w: number, min: number, max: number) {
         super(n, w);
@@ -25,8 +27,12 @@ export class  ScalarEncoder extends EncoderBase {
             num = this.max;
         }
 
-        const bucket = this.buckets.find((b) => b > num);
+        // const bucketbottom = this.buckets.find((b) => num >= b);
+        // const buckettop = this.buckets.find((b) => num < b);
+        const bucket = this.buckets.find((b) => b <= num && num < b + this.bucketSize);
         const bits = [];
+        // bits.push(num);
+        // bits.push(bucket);
         for (let i = 0; i < this.w; i++) {
             bits.push(bucket + i);
         }
@@ -37,12 +43,16 @@ export class  ScalarEncoder extends EncoderBase {
 
     private defineBuckets(n: number, w: number): void {
         const numberOfBuckets = n - w + 1;
-        const bucketSize = (this.max - this.min) / numberOfBuckets;
+        this.bucketSize = ((this.max - this.min) / numberOfBuckets);
         this.buckets = [];
+        this.bucketIndexes = [];
         let bucketValue: number = this.min;
+        let bucketIndex: number = 0;
         for (let i = 0; i < numberOfBuckets; i++) {
             this.buckets.push(bucketValue);
-            bucketValue += bucketSize;
+            bucketValue += this. bucketSize;
+            this.bucketIndexes.push(bucketIndex);
+            bucketIndex += 1;
         }
     }
 
