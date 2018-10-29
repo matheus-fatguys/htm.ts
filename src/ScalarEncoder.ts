@@ -3,22 +3,43 @@ import { ISDR } from "./SDR";
 import { SDRBuilder } from "./SDRBuilder";
 
 export class  ScalarEncoder extends EncoderBase {
-// export class  ScalarEncoder implements IEncoder {
+
+    public static getNforRadius(radius: number, w: number, min: number, max: number): number {
+        const range = max - min;
+        return (range / radius) + w - 1;
+    }
+
+    public static getNforPrecision(precision: number, w: number, min: number, max: number, rotative?: boolean): number {
+        let n: number;
+        console.log("rotative: " + rotative);
+        if (rotative == null || rotative === false) {
+            const range = max - min;
+            n = (range / precision) * w + w;
+        } else {
+            const range = max - min;
+            const nb = range / precision;
+            const m = nb * w;
+            n = m;
+        }
+        return n;
+    }
+
     public max: number;
     public min: number;
+    public rotative: boolean;
     public buckets: number[];
     public bucketIndexes: number[];
     public bucketSize: number;
 
-    public constructor(n: number, w: number, min: number, max: number) {
+    public constructor(n: number, w: number, min: number, max: number, rotative?: boolean) {
         super(n, w);
         this.verifyRange(min, max);
         this.max = max;
         this.min = min;
+        this.rotative = rotative != null ? rotative : false;
         this.defineBuckets(n, w);
     }
 
-    // tslint:disable-next-line:no-unused
     public encode(signal: any): ISDR {
         let num: number = signal as number;
         if (num < this.min) {
@@ -27,17 +48,21 @@ export class  ScalarEncoder extends EncoderBase {
             num = this.max;
         }
 
-        // const bucketbottom = this.buckets.find((b) => num >= b);
-        // const buckettop = this.buckets.find((b) => num < b);
-        const bucket = this.buckets.find((b) => b <= num && num < b + this.bucketSize);
+        let bucket = Number.MAX_VALUE;
+        let dist = (bucket - num) * (bucket - num);
+        this.buckets.forEach((bucketValue) => {
+            const currDist = (bucketValue - num) * (bucketValue - num);
+            if (currDist <= dist) {
+                dist = currDist;
+                bucket = bucketValue;
+            }
+        });
+        const bucketIndex = this.bucketIndexes[this.buckets.findIndex((b) => b === bucket)];
         const bits = [];
-        // bits.push(num);
-        // bits.push(bucket);
         for (let i = 0; i < this.w; i++) {
-            bits.push(bucket + i);
+            bits.push(bucketIndex + i);
         }
-
-        return SDRBuilder.build(this.n, this.w, bits);
+        return  SDRBuilder.build(this.n, this.w, bits);
 
     }
 
@@ -46,7 +71,7 @@ export class  ScalarEncoder extends EncoderBase {
         this.bucketSize = ((this.max - this.min) / numberOfBuckets);
         this.buckets = [];
         this.bucketIndexes = [];
-        let bucketValue: number = this.min;
+        let bucketValue: number = this.min + this.bucketSize / 2;
         let bucketIndex: number = 0;
         for (let i = 0; i < numberOfBuckets; i++) {
             this.buckets.push(bucketValue);

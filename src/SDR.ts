@@ -69,7 +69,6 @@ export class SDRImpl implements ISDR {
     }
 
     private verify(n: number, w: number, activeBits: number[]): void {
-        console.log("w:" + w + "n:" + n);
         if (w > n) {
             throw new Error("w:" + w + " must be less than n:" + n);
         }

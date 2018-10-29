@@ -37,39 +37,6 @@ export class ScalarEncoderTestFixture {
         const encoder = ScalarEncoderBuilder.build(n, w, min, max);
         Expect(encoder.bucketSize).toBe(7);
         Expect(encoder.buckets.length).toBe(3);
-        Expect(encoder.buckets).toEqual([0, 7, 14]);
+        Expect(encoder.buckets).toEqual([3.5, 10.5, 17.5]);
     }
-
-    @Test(`encoding 0, 7, 14 and 20 must result in
-    111111111111111111100 -> [0 - 18]
-    011111111111111111110 -> [1 - 19]
-    001111111111111111111 -> [2 - 20]
-    `)
-    public test_encoding() {
-        const w = 19;
-        const n = 21;
-        const max = 21;
-        const min = 0;
-        const encoder = ScalarEncoderBuilder.build(n, w, min, max);
-        // Expect(encoder.bucketSize).toBe(7);
-        // Expect(encoder.buckets.length).toBe(3);
-        // Expect(encoder.buckets).toEqual([0, 7, 14]);
-        // Expect(encoder.encode(0).activeBits)
-        // .toEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18]);
-        // Expect(encoder.encode(0.1).activeBits)
-        // .toEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18]);
-        // Expect(encoder.encode(6.9).activeBits)
-        // .toEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18]);
-        Expect(encoder.encode(7).activeBits)
-        .toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]);
-        // Expect(encoder.encode(13.9).activeBits)
-        // .toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]);
-        // Expect(encoder.encode(14).activeBits)
-        // .toEqual([2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]);
-        // Expect(encoder.encode(19.9).activeBits)
-        // .toEqual([2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]);
-        // Expect(encoder.encode(20).activeBits)
-        // .toEqual([2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]);
-    }
-
 }
