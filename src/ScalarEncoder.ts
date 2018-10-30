@@ -13,13 +13,9 @@ export class  ScalarEncoder extends EncoderBase {
         let n: number;
         console.log("rotative: " + rotative);
         if (rotative == null || rotative === false) {
-            const range = max - min;
-            n = (range / precision) * w + w;
+            n = (((max - min) / precision) + 1 ) * w;
         } else {
-            const range = max - min;
-            const nb = range / precision;
-            const m = nb * w;
-            n = m;
+            n = (((max - min) / precision) - 1 / w ) * w + 1;
         }
         return n;
     }
@@ -67,7 +63,7 @@ export class  ScalarEncoder extends EncoderBase {
     }
 
     private defineBuckets(n: number, w: number): void {
-        const numberOfBuckets = n - w + 1;
+        const numberOfBuckets = this.rotative ? n : n - w + 1;
         this.bucketSize = ((this.max - this.min) / numberOfBuckets);
         this.buckets = [];
         this.bucketIndexes = [];
