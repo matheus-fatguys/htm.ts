@@ -40,8 +40,8 @@ export class  ScalarEncoder extends EncoderBase {
         let num: number = signal as number;
         if (num < this.min) {
             num = this.min;
-        } else if (num > this.max) {
-            num = this.max;
+        } else if (num >= this.max) {
+            num = this.rotative ? this.min : this.max;
         }
 
         let bucket = Number.MAX_VALUE;
@@ -55,8 +55,13 @@ export class  ScalarEncoder extends EncoderBase {
         });
         const bucketIndex = this.bucketIndexes[this.buckets.findIndex((b) => b === bucket)];
         const bits = [];
+        let j = 0;
         for (let i = 0; i < this.w; i++) {
-            bits.push(bucketIndex + i);
+            let bit = bucketIndex + i;
+            if (this.rotative && bit >= this.buckets.length) {
+                bit = 0 + j++;
+            }
+            bits.push(bit);
         }
         return  SDRBuilder.build(this.n, this.w, bits);
 
@@ -67,13 +72,17 @@ export class  ScalarEncoder extends EncoderBase {
         this.bucketSize = ((this.max - this.min) / numberOfBuckets);
         this.buckets = [];
         this.bucketIndexes = [];
-        let bucketValue: number = this.min + this.bucketSize / 2;
-        let bucketIndex: number = 0;
+        let bucketValue: number =  this.rotative ? this.min : this.min + this.bucketSize / 2;
+        let bit: number = this.rotative ? numberOfBuckets - this.w + 1 : 0;
+
         for (let i = 0; i < numberOfBuckets; i++) {
             this.buckets.push(bucketValue);
             bucketValue += this. bucketSize;
-            this.bucketIndexes.push(bucketIndex);
-            bucketIndex += 1;
+            if (this.rotative && bit >= numberOfBuckets) {
+                bit = bit - numberOfBuckets;
+            }
+            this.bucketIndexes.push(bit);
+            bit++;
         }
     }
 

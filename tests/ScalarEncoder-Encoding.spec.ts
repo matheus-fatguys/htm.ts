@@ -460,7 +460,7 @@ export class ScalarEncoderEncodingTestFixture {
 
     w=2, p=0.1, n=20, nb=20
     0.0 - 10000000000000000001
-          01100000000000000000
+          11000000000000000000
     0.1 - 01100000000000000000
           00110000000000000000
     0.2 - 00011000000000000000
@@ -481,7 +481,7 @@ export class ScalarEncoderEncodingTestFixture {
           00000000000000000011
     1.0 - 10000000000000000001
 
-    w= 3, p=0.25, n=10, nb=12
+    w= 3, p=0.25, n=12, nb=12
     0.00 - 100000000011
            110000000001
            111000000000
@@ -551,19 +551,47 @@ export class ScalarEncoderEncodingTestFixture {
 
         const encoder = ScalarEncoderBuilder.build(n, w, min, max, rotative);
 
+        Expect(encoder.bucketIndexes)
+            .toEqual([19, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+                    10, 11, 12, 13, 14, 15, 16, 17, 18]);
+        Expect(encoder.buckets.map((b) => Number(b.toFixed(2)))) // .map((b) => (b - min) * (b - min)))
+            .toEqual([0.00, 0.05, 0.10, 0.15, 0.20, 0.25, 0.30, 0.35, 0.40, 0.45, 0.50,
+                    0.55, 0.60, 0.65, 0.70, 0.75, 0.80, 0.85, 0.90, 0.95]);
         Expect(encoder.encode(min).activeBits)
             .toEqual([0, n - 1]);
         Expect(encoder.encode(max).activeBits)
             .toEqual([0, n - 1]);
 
-        // let i1 = 0;
-        // let i2 = 1;
-        // for (let i = min + precision; i < max; i += precision / 3) {
-        //     Expect(encoder.encode(i).activeBits)
-        //     .toEqual([i1, i2]);
-        //     i1 += 1;
-        //     i2 += 1;
-        // }
+        let i1 = 0;
+        let i2 = n - 1;
+        for (let i = min; i < max; i += precision / w) {
+            Expect([i].concat(encoder.encode(i).activeBits))
+            .toEqual([i, i1, i2]);
+            if (i === min) {
+                i = 0;
+            } else {
+                i1 += 1;
+            }
+            i2 += 1;
+            if (i === 0) {
+                i2 = 1;
+            } else if (i >= n - 1) {
+                i2 = 0;
+            }
+        }
+
+        const encoder3 = ScalarEncoderBuilder.build(n3, 3, min, max, rotative);
+        Expect(encoder3.bucketIndexes)
+            .toEqual([10, 11, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
+        Expect(encoder3.buckets.map((b) => Number(b.toFixed(3)))) // .map((b) => (b - min) * (b - min)))
+            .toEqual([0.00, 0.0833, 0.0833 + 0.0833, 0.25, 0.25 + 0.0833, 0.25 + 0.0833 + 0.0833,
+                0.50, 0.50 + 0.0833, 0.5 + 0.0833 + 0.0833, 0.75, 0.75 + 0.0833, 0.75 + 0.0833 + 0.0833]
+                .map((b) => Number(b.toFixed(3))));
+        Expect(encoder3.encode(min).activeBits)
+            .toEqual([0, n3 - 2, n3 - 1]);
+        Expect(encoder3.encode(max).activeBits)
+            .toEqual([0, n3 - 2, n3 - 1]);
+
     }
 
 }
